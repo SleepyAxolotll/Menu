@@ -1,27 +1,21 @@
-from fastapi import FastAPI, UploadFile
+from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import JSONResponse
 from bs4 import BeautifulSoup
 from openpyxl import Workbook
+import uvicorn
 
 app = FastAPI()
 
 @app.post("/process_menu")
-async def process_menu(file_upload: UploadFile):
+async def process_menu(file_upload: UploadFile = File(...)):
     try:
-        # Ensure correct file path for Excel output
         excel_file_path = "menu.xlsx"
-
-        # Create a new workbook and set the active worksheet
         wb = Workbook()
         ws = wb.active
 
-        # Read HTML file content from the uploaded file
         html_content = await file_upload.read()
-
-        # Parse HTML content using BeautifulSoup
         soup = BeautifulSoup(html_content, 'html.parser')
 
-        # Extract data from HTML and populate Excel worksheet
         date_wrappers = soup.find_all(class_="day-name")
         meal_names = [meal_name.h3.get_text(strip=True) for meal_name in soup.find_all(class_="meal-name")]
         ul_elements = soup.find_all('ul')
@@ -51,10 +45,11 @@ async def process_menu(file_upload: UploadFile):
             else:
                 ws.cell(row=day_tracker, column=4, value=list_string)
                 day_tracker += 1
-
-        # Save Excel file
         wb.save(excel_file_path)
 
         return JSONResponse(content={"message": "HTML file processed and Excel file generated."})
     except Exception as e:
         return JSONResponse(status_code=500, content={"message": f"An error occurred: {str(e)}"})
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="127.0.0.1", port=8000)
