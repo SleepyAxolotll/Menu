@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, Filehttps://github.com/SleepyAxolotll/Menu/blob/main/main.py
+from fastapi import FastAPI, UploadFile
 from fastapi.responses import JSONResponse
 from bs4 import BeautifulSoup
 from openpyxl import Workbook
