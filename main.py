@@ -11,7 +11,7 @@ def read_root():
     return {"message": "Welcome to the Menu Processing App!"}
     
 @app.post("/process_menu")
-async def process_menu(file_upload: UploadFile = File(...)):
+async def process_menu(file_upload: UploadFile):
     try:
         excel_file_path = "menu.xlsx"
         wb = Workbook()
