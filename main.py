@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, Filehttps://github.com/SleepyAxolotll/Menu/blob/main/main.py
 from fastapi.responses import JSONResponse
 from bs4 import BeautifulSoup
 from openpyxl import Workbook
@@ -52,4 +52,4 @@ async def process_menu(file_upload: UploadFile = File(...)):
         return JSONResponse(status_code=500, content={"message": f"An error occurred: {str(e)}"})
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
