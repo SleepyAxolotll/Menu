@@ -3,9 +3,8 @@ from fastapi.responses import JSONResponse, FileResponse
 from bs4 import BeautifulSoup
 from openpyxl import Workbook
 import tempfile
-import shutil
-import uvicorn
 import os
+import uvicorn
 
 app = FastAPI()
 
@@ -25,6 +24,7 @@ async def process_menu(file_upload: UploadFile):
             html_content = await file_upload.read()
             soup = BeautifulSoup(html_content, 'html.parser')
 
+            # Extract data from HTML and populate the Excel workbook
             date_wrappers = soup.find_all(class_="day-name")
             meal_names = [meal_name.h3.get_text(strip=True) for meal_name in soup.find_all(class_="meal-name")]
             ul_elements = soup.find_all('ul')
@@ -55,12 +55,14 @@ async def process_menu(file_upload: UploadFile):
                     ws.cell(row=day_tracker, column=4, value=list_string)
                     day_tracker += 1
 
+            # Save the workbook to the temporary file
             wb.save(excel_file_path)
 
             # Return the Excel file as a downloadable response
             return FileResponse(excel_file_path, filename="menu.xlsx", media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
     except Exception as e:
+        # Handle and log specific exceptions for debugging
         return JSONResponse(status_code=500, content={"message": f"An error occurred: {str(e)}"})
 
 if __name__ == "__main__":
