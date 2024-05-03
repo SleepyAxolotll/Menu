@@ -51,7 +51,7 @@ async def process_menu(file_upload: UploadFile):
                 day_tracker += 1
         wb.save(excel_file_path)
 
-        return JSONResponse(content={"message": "HTML file processed and Excel file generated."})
+        return FileResponse(excel_file_path, filename="menu.xlsx", media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     except Exception as e:
         return JSONResponse(status_code=500, content={"message": f"An error occurred: {str(e)}"})
 
