@@ -29,26 +29,31 @@ async def process_menu(file_upload: UploadFile):
         for index, value in enumerate(food_times_list, start=2):
             ws.cell(row=index, column=1, value=value)
 
-        meals_list = ["BREAKFAST", "LUNCH", "DINNER"]
+        meals_list = ["LUNCH", "DINNER"]
         for col, meal in enumerate(meals_list, start=2):
             ws.cell(row=1, column=col, value=meal)
 
         day_tracker = 2
         meal_name_counter = 0
-
+        unwanted_food = ["vegetable", "allergens", "traceallergens", "rice", "pasta"]
+    
         for ul in ul_elements:
             current_meal_name = meal_names[meal_name_counter]
             meal_name_counter += 1
 
-            food_elements_list = [food_item.find('div').getText(strip=True) for food_item in ul.find_all('li', class_='food')]
-            list_string = ', '.join(map(str, food_elements_list))
+            if "BREAKFAST" not in current_meal_name:
+                filtered_food_elements = [
+                    food_item.find('div').get_text(strip=True)
+                    for food_item in ul.find_all('li', class_='food')
+                    if not any(unwanted_word in food_item.get_text(strip=True).lower() for unwanted_word in unwanted_food)
+                ]
 
-            if "BREAKFAST" in current_meal_name:
+                list_string = ', '.join(map(str, filtered_food_elements))
+
+            if "LUNCH" in current_meal_name:
                 ws.cell(row=day_tracker, column=2, value=list_string)
-            elif "LUNCH" in current_meal_name:
+            elif "DINNER" in current_meal_name:
                 ws.cell(row=day_tracker, column=3, value=list_string)
-            else:
-                ws.cell(row=day_tracker, column=4, value=list_string)
                 day_tracker += 1
 
         wb.save(excel_file_path)
